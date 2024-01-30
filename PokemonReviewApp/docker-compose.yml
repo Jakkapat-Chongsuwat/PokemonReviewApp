@@ -1,8 +1,30 @@
 version: '3.4'
 
 services:
+  pokemonreviewdb:
+    container_name: pokemonreviewdb
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "8002:1433"
+    environment:
+          - ACCEPT_EULA=Y
+          - SA_PASSWORD=P@ssw0rd1234
+    networks:
+      - pokemonreviewapp
   pokemonreviewapp:
+    container_name: pokemonreviewapp
     image: ${DOCKER_REGISTRY-}pokemonreviewapp
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+        - "8001:80"
+    depends_on:
+        - pokemonreviewdb
+    environment:
+        - DB_HOST=pokemonreviewdb
+        - DB_NAME=PokemonReviewDB
+        - DB_SA_PASSWORD=P@ssw0rd1234
+    networks:
+        - pokemonreviewapp
+
