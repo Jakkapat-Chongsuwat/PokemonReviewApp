@@ -17,10 +17,10 @@ namespace PokemonReviewApp.Repositories
         {
             return _context.Categories.Any(c => c.Id == Id);
         }
-        public bool CategoryExists(string categoryName)
+        public bool CategoryExists(string name)
         {
             // Check if categoryName is null before calling Trim()
-            string? trimmedName = categoryName?.Trim();
+            string? trimmedName = name?.Trim();
 
             // Additionally, check if trimmedName is null or empty before proceeding
             if (string.IsNullOrEmpty(trimmedName))
@@ -37,9 +37,10 @@ namespace PokemonReviewApp.Repositories
             return Save();
         }
 
-        public bool CreateCategory(CategoryDto category)
+        public bool DeleteCategory(Category category)
         {
-            throw new NotImplementedException();
+            _context.Remove(category);
+            return Save();
         }
 
         public ICollection<Category> GetCategories()
@@ -61,6 +62,12 @@ namespace PokemonReviewApp.Repositories
         {
             int saved = _context.SaveChanges();
             return saved > 0 ? true : false;
+        }
+
+        public bool UpdateCategory(Category category)
+        {
+            _context.Update(category);
+            return Save();
         }
     }
 }

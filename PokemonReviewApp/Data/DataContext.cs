@@ -42,6 +42,11 @@ namespace PokemonReviewApp.Data
                     .HasOne(p => p.Owner)
                     .WithMany(pc => pc.PokemonOwners)
                     .HasForeignKey(c => c.OwnerId);
+
+            modelBuilder.Entity<Owner>()
+            .HasOne(o => o.Country)  // Owner has one Country
+            .WithMany(c => c.Owners) // Country has many Owners
+            .HasForeignKey(o => o.CountryId); // Foreign key in Owner table
         }
     }
 }

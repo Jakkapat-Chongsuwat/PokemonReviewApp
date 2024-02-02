@@ -20,6 +20,26 @@ namespace PokemonReviewApp.Repositories
             return _context.Countries.Any(c => c.Id == Id);
         }
 
+        public bool CountryExists(string name)
+        {
+            // Check if categoryName is null before calling Trim()
+            string? trimmedName = name?.Trim();
+
+            // Additionally, check if trimmedName is null or empty before proceeding
+            if (string.IsNullOrEmpty(trimmedName))
+            {
+                return false;
+            }
+
+            return _context.Countries.Any(c => c.Name.ToLower() == trimmedName.ToLower());
+        }
+
+        public bool CreateCountry(Country country)
+        {
+            _context.Add(country);
+            return Save();
+        }
+
         public ICollection<Country> GetCountries()
         {
             return _context.Countries.ToList();
@@ -38,6 +58,18 @@ namespace PokemonReviewApp.Repositories
         public ICollection<Owner> GetOwnersByCountry(int countryId)
         {
             return _context.Owners.Where(o => o.Country.Id == countryId).ToList();
+        }
+
+        public bool Save()
+        {
+            int saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
+
+        public bool UpdateCountry(Country country)
+        {
+            _context.Update(country);
+            return Save();
         }
     }
 }

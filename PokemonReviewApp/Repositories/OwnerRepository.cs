@@ -2,6 +2,7 @@
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Diagnostics.Metrics;
 
 namespace PokemonReviewApp.Repositories
 {
@@ -12,6 +13,18 @@ namespace PokemonReviewApp.Repositories
         public OwnerRepository(DataContext context)
         {
             _context = context;
+        }
+
+        public bool CreateOwner(Owner owner)
+        {
+            _context.Add(owner);
+            return Save();
+        }
+
+        public bool DeleteOwner(Owner owner)
+        {
+            _context.Remove(owner);
+            return Save();
         }
 
         public Owner GetOwner(int ownerId)
@@ -44,6 +57,28 @@ namespace PokemonReviewApp.Repositories
         public bool OwnerExists(int ownerId)
         {
             return _context.Owners.Any(o => o.Id == ownerId);
+        }
+
+        public bool OwnerExists(string firstName, string lastName)
+        {
+            // Check if firstName and lastName are null before calling Trim()
+            string? trimmedFirstName = firstName?.Trim();
+            string? trimmedLastName = lastName?.Trim();
+
+            // Additionally, check if trimmedFirstName or trimmedLastName is null or empty before proceeding
+            if (string.IsNullOrEmpty(trimmedFirstName) || string.IsNullOrEmpty(trimmedLastName))
+            {
+                return false;
+            }
+
+            // Check if there is any owner with the given first name and last name
+            return _context.Owners.Any(o => o.FirstName.ToLower() == trimmedFirstName.ToLower() && o.LastName.ToLower() == trimmedLastName.ToLower());
+        }
+
+        public bool Save()
+        {
+            int saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
         }
     }
 }

@@ -4,6 +4,7 @@ using PokemonReviewApp.Data;
 using PokemonReviewApp.Data.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using PokemonReviewApp.Repositories;
 using System.Collections;
 
 namespace PokemonReviewApp.Controllers
@@ -35,7 +36,7 @@ namespace PokemonReviewApp.Controllers
             return Ok(reviewers);
         }
 
-        [HttpGet("{reviewerId}/reviewer")]
+        [HttpGet("{reviewerId}/reviewer", Name = "GetReviewer")]
         [ProducesResponseType(200, Type = typeof(Reviewer))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -70,5 +71,43 @@ namespace PokemonReviewApp.Controllers
             }
             return Ok(reviews);
         }
+
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(CreateReviewerDto))]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
+        public IActionResult CreateReviewer([FromBody] CreateReviewerDto reviewerToCreateDto)
+        {
+            if (reviewerToCreateDto == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (_reviewerRepository.ReviewerExists(reviewerToCreateDto.Id))
+            {
+                ModelState.AddModelError("", $"Reviewer with ID {reviewerToCreateDto.Id} already exists.");
+                return StatusCode(409, ModelState);
+            }
+
+            // Assuming OwnerDto has FirstName and LastName properties
+            if (_reviewerRepository.ReviewerExists(reviewerToCreateDto.FirstName, reviewerToCreateDto.LastName))
+            {
+                ModelState.AddModelError("", $"Reviewer with name {reviewerToCreateDto.FirstName} {reviewerToCreateDto.LastName} already exists!");
+                return StatusCode(409, ModelState); // 409 Conflict
+            }
+
+            Reviewer reviewer = _mapper.Map<Reviewer>(reviewerToCreateDto);
+
+            if (!_reviewerRepository.CreateReviewer(reviewer))
+            {
+                ModelState.AddModelError("", $"Something went wrong saving the reviewer {reviewerToCreateDto.Id}");
+                return StatusCode(500, ModelState);
+            }
+
+            ReviewerDto createdReviewerDto = _mapper.Map<ReviewerDto>(reviewer);
+
+            return CreatedAtRoute("GetReviewer", new { reviewerId = createdReviewerDto.Id }, createdReviewerDto);
+        }
     }
 }
+

@@ -11,11 +11,15 @@ namespace PokemonReviewApp.Controllers
     public class ReviewController : Controller
     {
         private IReviewRepository _reviewRepository;
+        private IPokemonRepository _pokemonRepository;
+        private IReviewerRepository _reviewerRepository;
         private IMapper _mapper;
 
-        public ReviewController(IReviewRepository reviewRepository, IMapper mapper)
+        public ReviewController(IReviewRepository reviewRepository,IPokemonRepository pokemonRepository,IReviewerRepository reviewerRepository,IMapper mapper)
         {
             _reviewRepository = reviewRepository;
+            _pokemonRepository = pokemonRepository;
+            _reviewerRepository = reviewerRepository;
             _mapper = mapper;
         }
 
@@ -33,7 +37,7 @@ namespace PokemonReviewApp.Controllers
             return Ok(reviews);
         }
 
-        [HttpGet("{reviewId}")]
+        [HttpGet("{reviewId}", Name = ("GetReview"))]
         [ProducesResponseType(200, Type = typeof(Review))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -81,6 +85,39 @@ namespace PokemonReviewApp.Controllers
                 // Catch the exception thrown by the repository
                 return NotFound(ex.Message);
             }
+        }
+
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(CreateReviewDto))]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
+        public IActionResult CreateReview([FromBody] CreateReviewDto reviewDto)
+        {
+            if (reviewDto == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (_reviewRepository.ReviewExists(reviewDto.Id))
+            {
+                ModelState.AddModelError("", $"Review with ID {reviewDto.Id} already exists.");
+                return StatusCode(409, ModelState);
+            }
+
+            Review review = _mapper.Map<Review>(reviewDto);
+
+            review.Pokemon = _pokemonRepository.GetPokemon(reviewDto.PokemonId);
+            review.Reviewer = _reviewerRepository.GetReviewer(reviewDto.ReviewerId);
+
+            if (!_reviewRepository.CreateReview(review))
+            {
+                ModelState.AddModelError("", $"Something went wrong saving the review {reviewDto.Id}");
+                return StatusCode(500, ModelState);
+            }
+
+            ReviewDto createdReviewDto = _mapper.Map<ReviewDto>(review);
+
+            return CreatedAtRoute("GetReview", new { reviewId = createdReviewDto.Id }, createdReviewDto);
         }
     }
 }
