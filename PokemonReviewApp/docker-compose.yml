@@ -1,30 +1,17 @@
 version: '3.4'
 
 services:
-  pokemonreviewdb:
-    container_name: pokemonreviewdb
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    ports:
-      - "8002:1433"
-    environment:
-          - ACCEPT_EULA=Y
-          - SA_PASSWORD=P@ssw0rd1234
-    networks:
-      - pokemonreviewapp
   pokemonreviewapp:
-    container_name: pokemonreviewapp
-    image: ${DOCKER_REGISTRY-}pokemonreviewapp
+    image: pokemonreviewapp
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-        - "8001:80"
-    depends_on:
-        - pokemonreviewdb
+      - "8080:80"   # Map port 80 inside the container to port 8080 on the host for HTTP
+      - "8443:443"  # Map port 443 inside the container to port 8443 on the host for HTTPS
     environment:
-        - DB_HOST=pokemonreviewdb
-        - DB_NAME=PokemonReviewDB
-        - DB_SA_PASSWORD=P@ssw0rd1234
-    networks:
-        - pokemonreviewapp
-
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/aspnetapp.pfx
+    volumes:
+      - ./aspnetapp.pfx:/app/aspnetapp.pfx

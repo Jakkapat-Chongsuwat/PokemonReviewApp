@@ -1,0 +1,50 @@
+name: dockercompose6308030156166923137
+services:
+  pokemonreviewapp:
+    build:
+      context: E:\Personal\Learning\ASP_Backend\PokemonReviewApp\PokemonReviewApp
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_Kestrel__Certificates__Default__Password: pokemonreviewtest
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /app/aspnetapp.pfx
+      ASPNETCORE_URLS: https://+:443;http://+:80
+    image: pokemonreviewapp
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      protocol: tcp
+    - mode: ingress
+      target: 80
+      published: "8080"
+      protocol: tcp
+    - mode: ingress
+      target: 443
+      protocol: tcp
+    - mode: ingress
+      target: 443
+      published: "8443"
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: E:\Personal\Learning\ASP_Backend\PokemonReviewApp\PokemonReviewApp\aspnetapp.pfx
+      target: /app/aspnetapp.pfx
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\Jakkapat\AppData\Roaming/ASP.NET/Https
+      target: /root/.aspnet/https
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\Jakkapat\AppData\Roaming/Microsoft/UserSecrets
+      target: /root/.microsoft/usersecrets
+      read_only: true
+      bind:
+        create_host_path: true
+networks:
+  default:
+    name: dockercompose6308030156166923137_default
