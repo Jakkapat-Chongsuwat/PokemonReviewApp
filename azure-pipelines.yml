@@ -44,6 +44,10 @@ steps:
     action: 'Run a Docker Compose command'
     dockerComposeCommand: 'up -d --verbose'
 
+- script: |
+    docker images
+  displayName: 'List Docker Images'
+
 - task: ECRPushImage@1
   inputs:
     awsCredentials: 'AWSConnectionPokemonReviewApp'
