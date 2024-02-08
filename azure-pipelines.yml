@@ -44,14 +44,12 @@ steps:
     action: 'Run a Docker Compose command'
     dockerComposeCommand: 'up -d --verbose'
 
-# Assuming the ECRPushImage task is custom or part of extensions and is intended for pushing to AWS ECR
-# If pushing to ACR, the DockerCompose@0 task with 'Push services' action is recommended
-
-
 - task: ECRPushImage@1
   inputs:
     awsCredentials: 'AWSConnectionPokemonReviewApp'
     regionName: 'ap-southeast-1'
     imageSource: 'imagename'
-    sourceImageName: '$(Build.Repository.Name)'
+    sourceImageName: 'pokemon-review-image'
     repositoryName: 'pokemon-review-container'
+    logRequest: true
+    logResponse: true
