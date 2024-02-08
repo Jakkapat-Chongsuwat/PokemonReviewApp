@@ -38,8 +38,8 @@ steps:
     azureSubscription: $(azureSubscription)
     azureContainerRegistry: |
       {"loginServer":"$(acrLoginServer)", "id" : "/subscriptions/56db490d-ee21-4766-9719-5344d2cf7cf5/resourceGroups/PokemonReview/providers/Microsoft.ContainerRegistry/registries/PokemonReviewRegistry"}
-    dockerComposeFile: '$(Build.SourcesDirectory)\PokemonReviewApp\docker-compose.yml'
-    additionalDockerComposeFiles: '$(Build.SourcesDirectory)\PokemonReviewApp\docker-compose.override.yml'
+    dockerComposeFile: '**/docker-compose.yml'
+    additionalDockerComposeFiles: '**/docker-compose.override.yml'
     # Remove additionalDockerComposeFiles if not used
     action: 'Run a Docker Compose command'
     dockerComposeCommand: 'up -d --verbose'
