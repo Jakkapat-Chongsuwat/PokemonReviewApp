@@ -42,7 +42,7 @@ steps:
     additionalDockerComposeFiles: '**/docker-compose.override.yml'
     # Remove additionalDockerComposeFiles if not used
     action: 'Run a Docker Compose command'
-    dockerComposeCommand: 'up -d --verbose'
+    dockerComposeCommand: 'up --build'
 
 - script: |
     docker images
