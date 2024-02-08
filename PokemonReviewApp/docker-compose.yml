@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   pokemonreviewapp:
-    image: pokemonreviewapp
+    image: jakkapatchongsuwat/pokemonreviewapp
     build:
       context: .
       dockerfile: Dockerfile
