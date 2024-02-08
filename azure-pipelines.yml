@@ -53,7 +53,7 @@ steps:
     awsCredentials: 'AWSConnectionPokemonReviewApp'
     regionName: 'ap-southeast-1'
     imageSource: 'imagename'
-    sourceImageName: 'PokemonReviewApp'
+    sourceImageName: 'jakkapatchongsuwat/pokemonreviewapp'
     repositoryName: 'pokemon-review-container'
     logRequest: true
     logResponse: true
