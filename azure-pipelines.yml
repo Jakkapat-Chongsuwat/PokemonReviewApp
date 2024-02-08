@@ -55,5 +55,8 @@ steps:
     imageSource: 'imagename'
     sourceImageName: 'pokemonreviewregistry.azurecr.io/jakkapatchongsuwat/pokemonreviewapp'
     repositoryName: 'pokemon-review-container'
+    autoCreateRepository: true
     logRequest: true
     logResponse: true
+  
+ 
