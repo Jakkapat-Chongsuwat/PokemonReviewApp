@@ -1,9 +1,6 @@
 trigger:
 - main
 
-pool:
-  name: Local 
-
 variables:
   azureSubscription: 'Azure subscription 1(56db490d-ee21-4766-9719-5344d2cf7cf5)'
   acrLoginServer: 'pokemonreviewregistry.azurecr.io'
