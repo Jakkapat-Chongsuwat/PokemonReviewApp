@@ -1,0 +1,60 @@
+trigger:
+- main
+
+pool:
+  name: Local 
+
+variables:
+  azureSubscription: 'Azure subscription 1(56db490d-ee21-4766-9719-5344d2cf7cf5)'
+  acrLoginServer: 'pokemonreviewregistry.azurecr.io'
+  # Define acrUsername and acrPassword2 as secure pipeline variables or use a service connection
+
+steps:
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+    feedsToUse: 'select'
+    vstsFeed: 'efa08fa2-fcdd-4b35-ac10-e0063614ec78'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    projects: '**/*.csproj'
+    publishWebProjects: true
+
+- task: DockerCompose@0
+  displayName: 'Run Docker Compose Up'
+  inputs:
+    containerregistrytype: 'Azure Container Registry'
+    azureSubscription: $(azureSubscription)
+    azureContainerRegistry: |
+      {"loginServer":"$(acrLoginServer)", "id" : "/subscriptions/56db490d-ee21-4766-9719-5344d2cf7cf5/resourceGroups/PokemonReview/providers/Microsoft.ContainerRegistry/registries/PokemonReviewRegistry"}
+    dockerComposeFile: '$(Build.SourcesDirectory)\PokemonReviewApp\docker-compose.yml'
+    additionalDockerComposeFiles: '$(Build.SourcesDirectory)\PokemonReviewApp\docker-compose.override.yml'
+    # Remove additionalDockerComposeFiles if not used
+    action: 'Run a Docker Compose command'
+    dockerComposeCommand: 'up -d --verbose'
+
+# Assuming the ECRPushImage task is custom or part of extensions and is intended for pushing to AWS ECR
+# If pushing to ACR, the DockerCompose@0 task with 'Push services' action is recommended
+
+
+- task: ECRPushImage@1
+  inputs:
+    awsCredentials: 'AWSConnectionPokemonReviewApp'
+    regionName: 'ap-southeast-1'
+    imageSource: 'imagename'
+    sourceImageName: '$(Build.Repository.Name)'
+    repositoryName: 'pokemon-review-container'
